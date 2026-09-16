@@ -1,5 +1,6 @@
 # https://hub.docker.com/layers/library/node/22-alpine
-ARG NODE_IMAGE=node:22-alpine@sha256:8ea2348b068a9544dae7317b4f3aafcdc032df1647bb7d768a05a5cad1a7683f
+#ARG NODE_IMAGE=node:22-alpine@sha256:8ea2348b068a9544dae7317b4f3aafcdc032df1647bb7d768a05a5cad1a7683f
+ARG NODE_IMAGE=node:22-slim
 FROM ${NODE_IMAGE} AS builder
 
 WORKDIR /app
@@ -13,6 +14,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 # Install any recent pnpm; it reads package.json's `packageManager` field and
 # self-switches to the pinned version, keeping that field the single source of
 # truth shared with CI and local dev (no version pin or Corepack needed).
+RUN apt-get update && apt-get install -y libatomic1 && rm -rf /var/lib/apt/lists/*
 RUN npm install --global pnpm && pnpm install --frozen-lockfile
 
 COPY tsconfig.json tsconfig.build.json ./
